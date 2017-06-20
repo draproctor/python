@@ -1,4 +1,4 @@
-def tax_bracket(income):
+def tax_calc(income):
     income = float(income)
     first_bracket = income - (0.10 * income)
     second_bracket = income - (932 + 0.15 * (income - 9325))
@@ -24,5 +24,34 @@ def tax_bracket(income):
     else:
         print 'Invalid integer entered. Please try again.'
 
-income = raw_input("What's your yearly income?\n")
-print "%f is earned each year after taxes." % (tax_bracket(income))
+def paycheck_info(post_tax):
+    return post_tax / 26
+
+def monthly_info(post_tax):
+    return post_tax / 12
+
+def max_rent_info(monthly):
+    return monthly / 3
+
+def mo_post_rent(monthly,rent):
+    return monthly - rent
+
+def mo_all_bills(monthly,rent,bills):
+    return monthly - rent - bills
+
+income = float(raw_input("What's your yearly income?\n"))
+rent = float(raw_input("What's your current monthly rent?\n"))
+bills = float(raw_input("What's your current misc. bills per month?\n"))
+
+post_tax = tax_calc(income)
+pc = paycheck_info(post_tax)
+mi = monthly_info(post_tax)
+mri = max_rent_info(mi)
+mpr = mo_post_rent(mi, rent)
+mab = mo_all_bills(mi, rent, bills)
+
+print "%f is earned each year after taxes." % (post_tax)
+print "%f is the maximum rent that can be paid." % (mri)
+print "%f is earned per paycheck." % (pc)
+print "%f is earned per month." % (mi)
+print "%f is earned per month after all bills." % (mpr)
