@@ -13,6 +13,7 @@ class PkillGui:
         self.label = Label(master, text='Click a button to murdile a process.')
         self.label.pack()
 
+        # Buttons region
         self.kill_citrix = Button(
             master,
             text='Kill BadApp',
