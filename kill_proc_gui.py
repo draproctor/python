@@ -10,7 +10,7 @@ class PkillGui:
         self.master = master
         master.title("Kill 'em dead!")
 
-        self.label = Label(master, text="Click a button to murdile a process.")
+        self.label = Label(master, text="Click a button to murdilate a process.")
         self.label.pack()
 
         # Buttons region
