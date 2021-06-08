@@ -1,70 +1,53 @@
-def income_remaining(income):
-    # Convert to float for proper calculations
-    income = float(income)
+#!/usr/bin/env python3
 
-    # First tax bracket
-    if income <= 9525:
-        return income - (0.10 * income)
-    # Second tax bracket
-    elif income > 9326 and income <= 38700:
-        return income - (952.50 + 0.12 * (income - 9525))
-    # Third tax bracket
-    elif income > 38701 and income <= 82500:
-        return income - (4453.50 + 0.22 * (income - 38700))
-    # Fourth tax bracket
-    elif income > 82501 and income <= 157_500:
-        return income - (14089.50 + 0.24 * (income - 82500))
-    # Fifth tax bracket
-    elif income > 157_501 and income <= 200_000:
-        return income - (32089.50 + 0.32 * (income - 157_500))
-    # Sixth tax bracket
-    elif income > 200_001 and income <= 500_000:
-        return income - (45689.50 + 0.35 * (income - 200_000))
-    # Seventh tax bracket
-    elif income > 500_001:
-        return income - (150_689.50 + 0.37 * (income - 500_000))
-    else:
-        print("Invalid value entered. Please try again.")
+import sys
+from tabulate import tabulate
 
 
-def tax_bonuses(bonus):
-    return float(bonus) / 2
+try:
+    taxable_income = int(sys.argv[1])
+except ValueError:
+    print(f"{sys.argv[1]} is not a valid number for calculating a taxable income.")
+    exit(1)
 
+# single filer brackets from https://www.nerdwallet.com/article/taxes/federal-income-tax-brackets
+bracket_limits = {
+    (518_401, sys.maxsize): lambda x: 156235 + (0.37 * (x - 518400)),
+    (207_351, 518_400): lambda x: 47367.5 + (0.35 * (x - 207350)),
+    (163_301, 207_350): lambda x: 33271.5 + (0.32 * (x - 163300)),
+    (85_526, 163_300): lambda x: 14605.5 + (0.24 * (x - 85525)),
+    (40_126, 85_525): lambda x: 4617.5 + (0.22 * (x - 40125)),
+    (9876, 40_125): lambda x: 987.5 + (0.12 * (x - 9875)),
+    (0, 9875): lambda x: 0.10 * x,
+}
 
-def paycheck_info(post_tax):
-    return post_tax / 26
+selected_bracket = None
 
+for income_bounds, tax_bracket_calc in bracket_limits.items():
+    lower_bound = income_bounds[0]
+    upper_bound = income_bounds[1]
+    if lower_bound < taxable_income and taxable_income < upper_bound:
+        selected_bracket = tax_bracket_calc
+        break
 
-def info_monthly(post_tax):
-    return post_tax / 12
+if selected_bracket == None:
+    print(f"No tax bracket satisfied the range. What the hell is {taxable_income}?")
+    exit(1)
 
+tax_owed = selected_bracket(taxable_income)
+gross_yearly_income = taxable_income - tax_owed
 
-def info_max_rent(monthly):
-    return monthly / 3
+tax_values = {
+    "Income": taxable_income,
+    "Tax Owed": selected_bracket(taxable_income),
+    "Gross Income": gross_yearly_income,
+    "Pct. Lost to Taxes": "{0:.0%}".format(tax_owed / taxable_income),
+}
+print(tabulate([tax_values], headers="keys", tablefmt="github"), "\n")
 
-
-def mo_post_rent(monthly, rent):
-    return monthly - rent
-
-
-def mo_all_bills(monthly, rent, bills):
-    return monthly - rent - bills
-
-
-income = input("What is your yearly income?\n")
-bonus = input("How much did you earn in bonuses for the year?\n")
-rent = float(input("What is your current monthly rent?\n"))
-bills = float(input("What is your current misc. bills per month?\n"))
-
-post_tax = income_remaining(income) + tax_bonuses(bonus)
-pc = paycheck_info(post_tax)
-mi = info_monthly(post_tax)
-mri = info_max_rent(mi)
-mpr = mo_post_rent(mi, rent)
-mab = mo_all_bills(mi, rent, bills)
-
-print(f"{round(post_tax, 2)} is earned each year after taxes.")
-print(f"{round(mri, 2)} is the maximum rent that can be paid.")
-print(f"{round(pc, 2)} is earned per paycheck.")
-print(f"{round(mi, 2)} is earned per month.")
-print(f"{round(mpr, 2)} is earned per month after all bills.")
+spendable_monies = {
+    "Monthly Gross Income": gross_yearly_income / 12,
+    "Paycheck Value": gross_yearly_income / 26,
+    "Maximum Rent": gross_yearly_income / 36,
+}
+print(tabulate([spendable_monies], headers="keys", tablefmt="github"))
