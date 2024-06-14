@@ -3,7 +3,7 @@ from subprocess import call
 
 
 class PkillGui:
-    def __init__(self, master):
+    def __init__(self, master: Tk):
         self.master = master
         master.title("Kill 'em dead!")
 
