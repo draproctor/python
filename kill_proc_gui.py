@@ -11,23 +11,23 @@ class PkillGui:
         self.label.pack()
 
         # Buttons region
-        self.kill_citrix = Button(
-            master, text="Kill BadApp", command=lambda: self.kill_process("BadApp")
+        self.kill_citrix = self.stop_process_button(
+            text="Kill BadApp", process_name="BadApp"
         )
-        self.kill_citrix.pack()
-
-        self.kill_bomgar = Button(
-            master,
-            text="Kill CantStopWontStop",
-            command=lambda: self.kill_process("CantStopWontStop"),
+        self.kill_bomgar = self.stop_process_button(
+            text="Kill CantStopWontStop", process_name="CantStopWontStop"
         )
-        self.kill_bomgar.pack()
-
         self.quit = Button(master, text="Quit", command=master.quit)
         self.quit.pack()
 
-    def kill_process(self, process: str):
-        call(["/usr/bin/pkill", "-i", process])
+    def stop_process_button(self, text: str, process_name: str) -> Button:
+        button = Button(
+            self.master,
+            text=text,
+            command=lambda: call(["/usr/bin/pkill", "-i", process_name]),
+        )
+        button.pack()
+        return button
 
 
 if __name__ == "__main__":
