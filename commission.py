@@ -1,63 +1,59 @@
 import sys
 from dataclasses import dataclass
-import matplotlib.pyplot as plt
 
-
-@dataclass
-class SalesRange:
-    minimum: int
-    maximum: int
-
-    def __contains__(self, sales: float | int) -> bool:
-        return self.minimum <= sales
+from matplotlib import pyplot
 
 
 @dataclass
 class CommissionBracket:
     rate: float
-    sales_range: SalesRange
+    sales_range: range
 
     def sales_bonus(self, sales: float | int) -> float:
-        if sales < 0:
-            raise ValueError("How did you lose money in a sale?")
-        if sales not in self.sales_range:
+        if sales < self.sales_range.start:
             return 0.0
         # A bracket only applies to the maximum amount of sales in its range.
-        sales = min(sales, self.sales_range.maximum)
-        bonus = self.rate * (sales - self.sales_range.minimum)
-        print(f"{self.rate} * ({sales} - {self.sales_range.minimum}) = ${bonus:,.2f}")
+        sales = min(sales, self.sales_range.stop)
+        bonus = self.rate * (sales - self.sales_range.start)
+        print(f"{self.rate} * ({sales} - {self.sales_range.start}) = ${bonus:,.2f}")
         return bonus
 
 
-def get_bonus_from_total_sales(total_sales: int) -> float:
-    ranges = {
-        0.28: SalesRange(600_000, sys.maxsize),
-        0.21: SalesRange(525_000, 600_000 - 1),
-        0.19: SalesRange(400_000, 525_000 - 1),
-        0.16: SalesRange(320_000, 400_000 - 1),
-        0.14: SalesRange(240_000, 400_000 - 1),
-        0.12: SalesRange(150_000, 240_000 - 1),
-        0.10: SalesRange(0, 150_000 - 1),
-    }
-    comp_brackets = [
-        CommissionBracket(rate=rate, sales_range=sales_range)
-        for rate, sales_range in ranges.items()
-    ]
-    return sum(bracket.sales_bonus(total_sales) for bracket in comp_brackets)
+class IncomeTracker:
+    brackets: list[CommissionBracket]
+
+    def __init__(self) -> None:
+        ranges = {
+            0.28: range(600_000, sys.maxsize),
+            0.21: range(525_000, 600_000),
+            0.19: range(400_000, 525_000),
+            0.16: range(320_000, 400_000),
+            0.14: range(240_000, 400_000),
+            0.12: range(150_000, 240_000),
+            0.10: range(0, 150_000),
+        }
+        self.brackets = [
+            CommissionBracket(rate=rate, sales_range=sales_range)
+            for rate, sales_range in ranges.items()
+        ]
+
+    def total_bonus(self, total_sales: int) -> float:
+        return sum(bracket.sales_bonus(total_sales) for bracket in self.brackets)
 
 
 def main() -> None:
+    tracker = IncomeTracker()
     sales_data = range(0, 1000000, 10000)
-    bonuses = [get_bonus_from_total_sales(sales) for sales in sales_data]
+    bonuses = [tracker.total_bonus(sales) for sales in sales_data]
 
-    plt.figure(figsize=(10, 6))
-    plt.plot(sales_data, bonuses, marker="o")
-    plt.title("Relationship between Total Sales and Bonuses")
-    plt.xlabel("Total Sales")
-    plt.ylabel("Bonus")
-    plt.grid(True)
-    plt.autoscale(True)
-    plt.show()
+    pyplot.figure(figsize=(10, 6))
+    pyplot.plot(sales_data, bonuses)
+    pyplot.title("Relationship between Total Sales and Bonuses")
+    pyplot.xlabel("Total Sales")
+    pyplot.ylabel("Bonus")
+    pyplot.grid(True)
+    pyplot.autoscale(True)
+    pyplot.show()
 
 
 if __name__ == "__main__":
