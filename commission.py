@@ -49,18 +49,9 @@ def get_bonus_from_total_sales(total_sales: int) -> float:
 
 
 def main() -> None:
-    # try:
-    #     total_income = int(sys.argv[1])
-    # except ValueError:
-    #     print(f"{sys.argv[1]} is not a valid number for calculating a commission.")
-    #     exit(1)
-    # total_commission = get_bonus_from_total_sales(total_income)
-    # print(f"Total commission: ${total_commission:,.2f}")
-
-    # Generate sales data
     sales_data = range(0, 1000000, 10000)
     bonuses = [get_bonus_from_total_sales(sales) for sales in sales_data]
-    # Plotting the data
+
     plt.figure(figsize=(10, 6))
     plt.plot(sales_data, bonuses, marker="o")
     plt.title("Relationship between Total Sales and Bonuses")
