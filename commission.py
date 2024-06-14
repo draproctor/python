@@ -3,6 +3,16 @@ from dataclasses import dataclass
 
 from matplotlib import pyplot
 
+BRACKET_RANGES = {
+    0.28: range(600_000, sys.maxsize),
+    0.21: range(525_000, 600_000),
+    0.19: range(400_000, 525_000),
+    0.16: range(320_000, 400_000),
+    0.14: range(240_000, 400_000),
+    0.12: range(150_000, 240_000),
+    0.10: range(0, 150_000),
+}
+
 
 @dataclass
 class CommissionBracket:
@@ -23,18 +33,9 @@ class IncomeTracker:
     brackets: list[CommissionBracket]
 
     def __init__(self) -> None:
-        ranges = {
-            0.28: range(600_000, sys.maxsize),
-            0.21: range(525_000, 600_000),
-            0.19: range(400_000, 525_000),
-            0.16: range(320_000, 400_000),
-            0.14: range(240_000, 400_000),
-            0.12: range(150_000, 240_000),
-            0.10: range(0, 150_000),
-        }
         self.brackets = [
             CommissionBracket(rate=rate, sales_range=sales_range)
-            for rate, sales_range in ranges.items()
+            for rate, sales_range in BRACKET_RANGES.items()
         ]
 
     def total_bonus(self, total_sales: int) -> float:
