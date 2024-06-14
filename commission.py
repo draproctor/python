@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import sys
 from dataclasses import dataclass
 import matplotlib.pyplot as plt

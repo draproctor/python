@@ -1,6 +1,3 @@
-#!/Library/Frameworks/Python.framework/Versions/3.7/bin/python3.7
-"""GUI tool for killing stuck processes"""
-
 from tkinter import Tk, Label, Button
 from subprocess import call
 
@@ -33,6 +30,7 @@ class PkillGui:
         call(["/usr/bin/pkill", "-i", process])
 
 
-root = Tk()
-my_gui = PkillGui(root)
-root.mainloop()
+if __name__ == "__main__":
+    root = Tk()
+    my_gui = PkillGui(root)
+    root.mainloop()
